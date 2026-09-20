@@ -1,0 +1,149 @@
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #000;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+canvas {
+    position: fixed;
+    inset: 0;
+    display: block;
+    z-index: 1;
+}
+
+#intro {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: radial-gradient(circle at center, rgba(255, 215, 0, 0.15), rgba(0, 0, 0, 1));
+    z-index: 100;
+}
+
+.intro-content {
+    text-align: center;
+    padding: 30px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 30px;
+}
+
+#intro h1 {
+    font-family: 'Dancing Script', cursive;
+    color: #FFD54F;
+    font-size: 4rem;
+    text-shadow:
+        0 0 10px #FFD54F,
+        0 0 20px #FFD54F,
+        0 0 40px gold,
+        0 0 80px gold;
+}
+
+#intro p {
+    margin-top: 20px;
+    color: white;
+    font-size: 1.3rem;
+}
+
+#startBtn {
+    margin-top: 30px;
+    padding: 16px 40px;
+    border: none;
+    border-radius: 50px;
+    background: linear-gradient(135deg, #FFD54F, #ffb300);
+    color: black;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: 0.3s;
+    box-shadow:
+        0 0 10px gold,
+        0 0 30px gold,
+        0 0 60px gold;
+}
+
+#startBtn:hover {
+    transform: scale(1.06);
+}
+
+#overlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 50;
+}
+
+#floatingTitle {
+    position: absolute;
+    top: 25px;
+    width: 100%;
+    text-align: center;
+    font-size: 3rem;
+    color: #ffe082;
+    opacity: 0;
+    font-family: 'Dancing Script', cursive;
+    text-shadow:
+        0 0 10px #fff176,
+        0 0 20px #fff176,
+        0 0 50px gold;
+}
+
+.phrase {
+    position: absolute;
+    color: #fff3c4;
+    font-size: 0.9rem;
+    text-shadow:
+        0 0 5px gold,
+        0 0 10px gold;
+    opacity: 0.7;
+}
+
+/* ESTRELLAS */
+
+.star {
+    position: fixed;
+    border-radius: 50%;
+    background: white;
+    z-index: 2;
+    pointer-events: none;
+    animation: twinkle infinite alternate;
+}
+
+@keyframes twinkle {
+    from {
+        opacity: 0.2;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1.8);
+        box-shadow:
+            0 0 5px white,
+            0 0 10px white,
+            0 0 20px gold,
+            0 0 30px gold;
+    }
+}
+
+.shooting-star {
+    position: fixed;
+    width: 120px;
+    height: 2px;
+    z-index: 3;
+    background: linear-gradient(90deg, white, transparent);
+    transform: rotate(-35deg);
+    box-shadow:
+        0 0 10px white,
+        0 0 20px gold;
+}
