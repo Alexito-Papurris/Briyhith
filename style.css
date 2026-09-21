@@ -27,54 +27,93 @@ canvas {
     display: flex;
     justify-content: center;
     align-items: center;
-    background: radial-gradient(circle at center, rgba(255, 215, 0, 0.15), rgba(0, 0, 0, 1));
+    background: radial-gradient(circle at center, rgba(255, 215, 0, 0.18), rgba(5, 2, 15, 0.98));
     z-index: 100;
+    padding: 20px;
+    overflow-y: auto;
 }
 
 .intro-content {
     text-align: center;
-    padding: 30px;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 30px;
+    padding: 25px 20px;
+    backdrop-filter: blur(12px);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    border-radius: 25px;
+    max-width: 450px;
+    width: 100%;
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
 }
 
 #intro h1 {
     font-family: 'Dancing Script', cursive;
     color: #FFD54F;
-    font-size: 4rem;
+    font-size: 2.8rem;
+    line-height: 1.2;
     text-shadow:
         0 0 10px #FFD54F,
         0 0 20px #FFD54F,
-        0 0 40px gold,
-        0 0 80px gold;
+        0 0 40px gold;
 }
 
-#intro p {
-    margin-top: 20px;
-    color: white;
-    font-size: 1.3rem;
+/* MARCO DE LA FOTO EN ENTRADA */
+.couple-photo-wrapper {
+    margin: 15px auto;
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    padding: 4px;
+    background: linear-gradient(135deg, #FFD54F, #ff0055, #ffb300);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+}
+
+.couple-photo-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    display: block;
+}
+
+.couple-names {
+    color: #ffffff;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-top: 5px;
+}
+
+.couple-names span {
+    color: #FFD54F;
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.6rem;
+}
+
+.love-description {
+    margin: 12px auto;
+    color: #fef08a;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    opacity: 0.95;
+    font-style: italic;
+    padding: 0 10px;
 }
 
 #startBtn {
-    margin-top: 30px;
-    padding: 16px 40px;
+    margin-top: 15px;
+    padding: 14px 32px;
     border: none;
     border-radius: 50px;
     background: linear-gradient(135deg, #FFD54F, #ffb300);
     color: black;
     font-weight: bold;
     cursor: pointer;
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     transition: 0.3s;
-    box-shadow:
-        0 0 10px gold,
-        0 0 30px gold,
-        0 0 60px gold;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
 }
 
 #startBtn:hover {
-    transform: scale(1.06);
+    transform: scale(1.05);
 }
 
 #overlay {
@@ -86,31 +125,28 @@ canvas {
 
 #floatingTitle {
     position: absolute;
-    top: 25px;
+    top: 20px;
     width: 100%;
     text-align: center;
-    font-size: 3rem;
+    font-size: 2.2rem;
     color: #ffe082;
     opacity: 0;
     font-family: 'Dancing Script', cursive;
     text-shadow:
         0 0 10px #fff176,
         0 0 20px #fff176,
-        0 0 50px gold;
+        0 0 40px gold;
 }
 
 .phrase {
     position: absolute;
     color: #fff3c4;
-    font-size: 0.9rem;
-    text-shadow:
-        0 0 5px gold,
-        0 0 10px gold;
-    opacity: 0.7;
+    font-size: 0.85rem;
+    text-shadow: 0 0 8px gold;
+    opacity: 0.8;
 }
 
-/* ESTRELLAS */
-
+/* ESTRELLAS Y ANIMACIONES */
 .star {
     position: fixed;
     border-radius: 50%;
@@ -128,22 +164,31 @@ canvas {
     to {
         opacity: 1;
         transform: scale(1.8);
-        box-shadow:
-            0 0 5px white,
-            0 0 10px white,
-            0 0 20px gold,
-            0 0 30px gold;
+        box-shadow: 0 0 10px gold;
     }
 }
 
-.shooting-star {
-    position: fixed;
-    width: 120px;
-    height: 2px;
-    z-index: 3;
-    background: linear-gradient(90deg, white, transparent);
-    transform: rotate(-35deg);
-    box-shadow:
-        0 0 10px white,
-        0 0 20px gold;
+/* RESPONSIVE AJUSTES */
+@media (max-width: 600px) {
+    #intro h1 {
+        font-size: 2.2rem;
+    }
+
+    .couple-photo-wrapper {
+        width: 110px;
+        height: 110px;
+    }
+
+    .love-description {
+        font-size: 0.82rem;
+    }
+
+    #floatingTitle {
+        font-size: 1.6rem;
+        top: 15px;
+    }
+
+    .phrase {
+        font-size: 0.75rem !important;
+    }
 }

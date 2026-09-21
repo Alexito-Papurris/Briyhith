@@ -4,6 +4,9 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { gsap } from 'https://cdn.jsdelivr.net/npm/gsap@3.12.5/index.js';
 
+// Detección de dispositivo móvil
+const isMobile = window.innerWidth <= 600;
+
 // -----------------------
 // ESCENA Y CÁMARA
 // -----------------------
@@ -16,16 +19,17 @@ const camera = new THREE.PerspectiveCamera(
     0.1,
     5000
 );
-camera.position.set(0, 0, 290);
+// En móvil alejamos ligeramente la cámara para abarcar el alto
+camera.position.set(0, 0, isMobile ? 310 : 290);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.outputColorSpace = THREE.SRGBColorSpace; // Garantiza que los colores generales sean fieles
+renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.autoClear = false; 
 document.body.appendChild(renderer.domElement);
 
-// Post-procesamiento (Glow / Bloom para el universo)
+// Post-procesamiento
 const composer = new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene, camera));
 
@@ -48,7 +52,7 @@ const starsGeometry = new THREE.BufferGeometry();
 const starsArray = [];
 const starsColors = [];
 
-for (let i = 0; i < 10000; i++) {
+for (let i = 0; i < 9000; i++) {
     starsArray.push(
         (Math.random() - 0.5) * 4000,
         (Math.random() - 0.5) * 4000,
@@ -77,13 +81,15 @@ const stars = new THREE.Points(starsGeometry, starsMaterial);
 scene.add(stars);
 
 /* -----------------------
-   PLANETA NEGRO
+   PLANETA Y ANILLO 3D
 ----------------------- */
 const planetGroup = new THREE.Group();
-planetGroup.position.y = -10;
+planetGroup.position.y = isMobile ? -5 : -10;
 
+// Ajuste de tamaño del planeta en móvil
+const planetRadius = isMobile ? 22 : 32;
 const planet = new THREE.Mesh(
-    new THREE.SphereGeometry(32, 64, 64),
+    new THREE.SphereGeometry(planetRadius, 64, 64),
     new THREE.MeshBasicMaterial({ color: 0x000000 })
 );
 planetGroup.add(planet);
@@ -94,13 +100,16 @@ scene.add(planetGroup);
 /* -----------------------
    DISCO DE PARTÍCULAS
 ----------------------- */
-const diskParticlesCount = 12000;
+const diskParticlesCount = 10000;
 const diskGeometry = new THREE.BufferGeometry();
 const diskPositions = [];
 const diskColors = [];
 
+const minRad = isMobile ? 26 : 38;
+const maxRadDelta = isMobile ? 28 : 42;
+
 for (let i = 0; i < diskParticlesCount; i++) {
-    const rad = 38 + Math.random() * 42;
+    const rad = minRad + Math.random() * maxRadDelta;
     const angle = Math.random() * Math.PI * 2;
 
     const x = Math.cos(angle) * rad;
@@ -134,7 +143,7 @@ planetGroup.add(accretionDisk);
 ----------------------- */
 const heartPoints = [];
 const heartColors = [];
-const totalParticles = 4500;
+const totalParticles = 4000;
 
 for (let i = 0; i < totalParticles; i++) {
     let t = Math.random() * Math.PI * 2;
@@ -143,9 +152,9 @@ for (let i = 0; i < totalParticles; i++) {
     let x = 16 * Math.pow(Math.sin(t), 3);
     let y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
 
-    const scale = 1.0;
+    const scale = isMobile ? 0.75 : 1.0;
     const px = x * r * scale;
-    const py = ((y + 17) * r * scale) + 32;
+    const py = ((y + 17) * r * scale) + (isMobile ? 24 : 32);
     const pz = (Math.random() - 0.5) * 10 * (1 - r);
 
     heartPoints.push(px, py, pz);
@@ -180,19 +189,25 @@ heart.visible = false;
 planetGroup.add(heart);
 
 /* -----------------------
-   RAMOS Y FOTOS (COLOR CORREGIDO Y VÍVIDO)
+   RAMOS Y FOTOS
 ----------------------- */
 const textureLoader = new THREE.TextureLoader();
 
 const imagePaths = [
     './assets/Ramo1.png',
+    './assets/uno.jpeg',
     './assets/Ramo2.png',
+    './assets/dos.jpeg',
     './assets/Ramo3.png',
+    './assets/tres.jpeg',
     './assets/Ramo4.png',
+    './assets/cuatro.jpeg',
     './assets/Ramo5.png',
     './assets/Ramo6.png',
+    './assets/principal.jpeg',
     './assets/Ramo7.png',
     './assets/Ramo8.png',
+    './assets/seis.jpeg',
     './assets/Ramo9.png'
 ];
 
@@ -200,10 +215,10 @@ const overlayGroup = new THREE.Group();
 scene.add(overlayGroup);
 
 const bouquets = [];
+const spriteScale = isMobile ? 16 : 24;
 
 imagePaths.forEach((path) => {
     const texture = textureLoader.load(path);
-    // AQUÍ ESTÁ LA CLAVE PARA QUITAR EL EFECTO BLANQUEADO/OPACO:
     texture.colorSpace = THREE.SRGBColorSpace; 
 
     const mat = new THREE.SpriteMaterial({ 
@@ -213,7 +228,7 @@ imagePaths.forEach((path) => {
     });
 
     const sprite = new THREE.Sprite(mat);
-    sprite.scale.set(24, 24, 1);
+    sprite.scale.set(spriteScale, spriteScale, 1);
     sprite.visible = false;
 
     overlayGroup.add(sprite);
@@ -221,21 +236,21 @@ imagePaths.forEach((path) => {
 });
 
 /* -----------------------
-   ESTRELLAS LATERALES CON VERSOS
+   ESTRELLAS CON VERSOS DE AMOR
 ----------------------- */
 const verses = [
-    "Cultivo una rosa blanca para el amigo sincero que me da su mano franca.",
-    "Bajo las estrellas amarillas, tu sonrisa siempre será mi lugar favorito.",
-    "Eres la luz que hace florecer hasta los rincones más oscuros.",
-    "Que tu camino siempre esté iluminado de girasoles y sueños cumplidos.",
-    "Un detalle no mide la distancia, sino el cariño con el que se entrega.",
-    "Cada flor que abre su capullo lleva un susurro de alegría para ti.",
-    "Tu alegría llena de color incluso el universo más lejano.",
-    "Un abrazo sincero guardado en el vuelo suave de una estrella.",
-    "Que nunca te falten motivos para sonreír bajo este cielo.",
-    "Las flores amarillas iluminan el presente tanto como tus recuerdos.",
-    "Florece con calma, el tiempo siempre premia a las almas bonitas.",
-    "Gracias por hacer este mundo un lugar un poco más brillante."
+    "Briyhith S. H., eres la luz que alegra cada uno de mis días.",
+    "Bajo estas estrellas, mi lugar favorito siempre será a tu lado.",
+    "Gracias por existir y por llenar mi vida de tanto amor, Briyhith.",
+    "Que tu camino siempre esté ilumindo de girasoles y sonrisas.",
+    "William M. N. te ama hoy, mañana y siempre.",
+    "Cada flor de este universo es un abrazo sincero para ti.",
+    "Tu sonrisa ilumina mi mundo entero, mi niña hermosa.",
+    "Contigo hasta el universo más lejano se siente como nuestro hogar.",
+    "Que nunca te falten motivos para sonreír, mi princesa.",
+    "Las flores amarillas florecen con la misma gracia con la que tú caminas.",
+    "Eres mi presente favorito y mi sueño hecho realidad.",
+    "Briyhith & William: Una historia escrita en las estrellas."
 ];
 
 function createStarTexture() {
@@ -265,10 +280,11 @@ function createStarTexture() {
 const starTexture = createStarTexture();
 const interactiveStars = [];
 
-for (let i = 0; i < 14; i++) {
+for (let i = 0; i < 12; i++) {
     const mat = new THREE.SpriteMaterial({ map: starTexture, transparent: true, opacity: 0.95 });
     const sprite = new THREE.Sprite(mat);
-    sprite.scale.set(11, 11, 1);
+    const starScale = isMobile ? 8 : 11;
+    sprite.scale.set(starScale, starScale, 1);
     
     sprite.userData = { 
         verse: verses[i % verses.length],
@@ -276,7 +292,9 @@ for (let i = 0; i < 14; i++) {
     };
 
     const isLeft = i % 2 === 0;
-    sprite.position.x = isLeft ? (-110 - Math.random() * 40) : (110 + Math.random() * 40);
+    const xOffset = isMobile ? (isLeft ? (-55 - Math.random() * 25) : (55 + Math.random() * 25)) : (isLeft ? (-110 - Math.random() * 40) : (110 + Math.random() * 40));
+    
+    sprite.position.x = xOffset;
     sprite.position.y = -120 + Math.random() * 240;
     sprite.position.z = (Math.random() - 0.5) * 60;
 
@@ -333,88 +351,58 @@ if (modalOverlay) {
 }
 
 /* -----------------------
-   ESTRELLAS FUGACES
------------------------ */
-function createShootingStar() {
-    const geometry = new THREE.BufferGeometry();
-    const positions = [0, 0, 0, -25, 15, -10];
-    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-
-    const material = new THREE.LineBasicMaterial({
-        color: 0xffffff,
-        transparent: true,
-        opacity: 0.9
-    });
-
-    const starLine = new THREE.Line(geometry, material);
-
-    starLine.position.set(
-        (Math.random() - 0.2) * 200 + 50,
-        Math.random() * 80 + 40,
-        (Math.random() - 0.5) * 100
-    );
-
-    scene.add(starLine);
-
-    gsap.to(starLine.position, {
-        x: starLine.position.x - 220,
-        y: starLine.position.y - 130,
-        duration: 1.2,
-        ease: 'power1.in',
-        onComplete: () => {
-            scene.remove(starLine);
-            geometry.dispose();
-            material.dispose();
-        }
-    });
-}
-
-setInterval(() => {
-    if (planetGroup.visible) createShootingStar();
-}, 4000);
-
-/* -----------------------
-   FRASES FLOTANTES
+   FRASES FLOTANTES DE LA PAREJA (SIN REPETIR)
 ----------------------- */
 const phrasesList = [
-    'Gracias por existir',
-    'Que todos tus sueños florezcan',
-    'Tu sonrisa ilumina mis días',
+    'William ❤️ Briyhith',
+    'Eres mi lugar favorito',
+    'Briyhith S. H. ✨',
+    'Gracias por existir, mi amor',
     'Siempre habrá un girasol para ti',
-    'Feliz Día de las Flores Amarillas',
     'Este universo fue creado para ti',
-    'Que nunca te falten motivos para sonreír'
+    'Tu sonrisa ilumina mis días',
+    'William M. N. te ama',
+    'Mi amor por ti es infinito ♾️',
+    'Juntos en nuestro propio universo 🌌',
+    'Mi niña hermosa 🌻',
+    'Tu felicidad es la mía 💖',
+    'Cada día a tu lado es un regalo 🎁',
+    'Amor de mi vida ❤️',
+    'Eres mi sueño hecho realidad ✨',
+    'Para siempre juntos, Briyhith & William 💑'
 ];
 
 const container = document.getElementById('phraseContainer');
 
 if (container) {
-    for (let i = 0; i < 16; i++) {
+    // Se recorre exactamente el tamaño de la lista para que aparezca UNA SOLA vez cada frase
+    phrasesList.forEach((text) => {
         const div = document.createElement('div');
         div.className = 'phrase';
-        div.innerText = phrasesList[i % phrasesList.length];
+        div.innerText = text;
         
         div.style.position = 'absolute';
         div.style.color = '#fef08a';
-        div.style.textShadow = '0 0 10px rgba(253, 224, 71, 0.5)';
-        div.style.fontSize = (Math.random() * 0.4 + 0.8) + 'rem';
+        div.style.textShadow = '0 0 10px rgba(253, 224, 71, 0.6)';
+        div.style.fontSize = isMobile ? (Math.random() * 0.2 + 0.75) + 'rem' : (Math.random() * 0.35 + 0.85) + 'rem';
         div.style.pointerEvents = 'none';
-        div.style.opacity = '0.7';
+        div.style.opacity = '0.85';
+        div.style.whiteSpace = 'nowrap'; // Evita que frases largas se partan en varias líneas
 
         container.appendChild(div);
         animateFloatingPhrase(div);
-    }
+    });
 }
 
 function animateFloatingPhrase(el) {
-    const startX = Math.random() * (window.innerWidth - 150);
-    const startY = Math.random() * (window.innerHeight - 50);
+    const startX = Math.random() * (window.innerWidth - 120);
+    const startY = Math.random() * (window.innerHeight - 40);
 
     gsap.set(el, { x: startX, y: startY });
 
     gsap.to(el, {
-        x: `+=${(Math.random() - 0.5) * 120}`,
-        y: `+=${(Math.random() - 0.5) * 120}`,
+        x: `+=${(Math.random() - 0.5) * (isMobile ? 60 : 120)}`,
+        y: `+=${(Math.random() - 0.5) * (isMobile ? 60 : 120)}`,
         duration: Math.random() * 6 + 6,
         repeat: -1,
         yoyo: true,
@@ -440,7 +428,7 @@ if (startBtn) {
         gsap.to('#floatingTitle', { opacity: 1, duration: 3 });
 
         gsap.to(camera.position, {
-            z: 170,
+            z: isMobile ? 220 : 170,
             duration: 4,
             ease: 'power2.inOut'
         });
@@ -466,23 +454,16 @@ function animate() {
     const pulse = 1 + Math.sin(time) * 0.03;
     heart.scale.set(pulse, pulse, pulse);
 
-    // Movimiento interno del corazón
-    const positions = heartGeometry.attributes.position.array;
-    for (let i = 0; i < positions.length; i += 3) {
-        positions[i] += Math.sin(time + i) * 0.02;
-        positions[i + 1] += Math.cos(time + i) * 0.02;
-    }
-    heartGeometry.attributes.position.needsUpdate = true;
-
-    // Órbita constante de las imágenes
+    // Órbita constante de los ramos (Radio adaptado a pantallas móviles)
     const bouquetCount = bouquets.length;
+    const orbitRadius = isMobile ? 62 : 115; // En celular reduce para que quepan en pantalla vertical
+
     bouquets.forEach((b, index) => {
         const angle = Date.now() * 0.00025 + (index * (Math.PI * 2 / bouquetCount));
-        const radius = 115;
 
-        b.position.x = planetGroup.position.x + Math.cos(angle) * radius;
-        b.position.z = Math.sin(angle) * radius;
-        b.position.y = planetGroup.position.y + Math.sin(angle * 2) * 8;
+        b.position.x = planetGroup.position.x + Math.cos(angle) * orbitRadius;
+        b.position.z = Math.sin(angle) * orbitRadius;
+        b.position.y = planetGroup.position.y + Math.sin(angle * 2) * (isMobile ? 5 : 8);
     });
 
     // Ascenso suave de estrellas
@@ -498,11 +479,11 @@ function animate() {
     // Render en dos fases independientes
     renderer.clear();
     
-    // 1. Dibujar galaxia, planeta y resplandor (Bloom)
+    // 1. Dibujar galaxia, planeta y resplandor
     overlayGroup.visible = false;
     composer.render();
 
-    // 2. Dibujar imágenes con su color e intensidad real encima
+    // 2. Dibujar imágenes vívidas por encima
     overlayGroup.visible = true;
     renderer.clearDepth();
     renderer.render(scene, camera);
@@ -511,11 +492,13 @@ function animate() {
 animate();
 
 /* -----------------------
-   RESIZE
+   RESIZE ADAPTATIVO
 ----------------------- */
 window.addEventListener('resize', () => {
+    const mobileNow = window.innerWidth <= 600;
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
+    
     renderer.setSize(window.innerWidth, window.innerHeight);
     composer.setSize(window.innerWidth, window.innerHeight);
 });
